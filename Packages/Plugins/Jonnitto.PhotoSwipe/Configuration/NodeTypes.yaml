@@ -1,0 +1,19 @@
+'Jonnitto.PhotoSwipe:LightboxMixin':
+  abstract: true
+  properties:
+    lightbox:
+      type: boolean
+      defaultValue: false
+      ui:
+        label: i18n
+        inspector:
+          group: image
+          position: 800
+
+'TYPO3.Neos.NodeTypes:TextWithImage':
+  superTypes:
+    'Jonnitto.PhotoSwipe:LightboxMixin': true
+
+'TYPO3.Neos.NodeTypes:Image':
+  superTypes:
+    'Jonnitto.PhotoSwipe:LightboxMixin': true

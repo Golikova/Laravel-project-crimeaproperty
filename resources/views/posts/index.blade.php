@@ -22,7 +22,7 @@
 			<h3><a href="/posts/{{$post->id}}">{{$post->title}}</a></h3>
 			@lang('posts.address'):
 			<br>
-			{{$post->city}}<br>
+			{{$post->city->name}}<br>
 			@if ($post->street)
 			@lang('posts.street') {{$post->street}} <br>
 			@endif

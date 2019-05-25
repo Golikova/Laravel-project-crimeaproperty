@@ -22,7 +22,7 @@ use Auth;
 class PostsController extends Controller
 {
 
-     
+
 
         /**
      * Create a new controller instance.
@@ -48,15 +48,16 @@ class PostsController extends Controller
             $city = (City::where('id',$post->city_id)->get());
             $post->city = $city[0]->name;
         }
+        
         $images = [''=>''];
         foreach ($posts as $post) {
-         $result = Image::where('post_id', $post->id)->get();
-         if (count($result)>0) {
-             $images[$post->id] = $result[0]->image;
-         }
-     }
-     return view('posts.index')->with('posts', $posts)->with('images', $images)->with('title', Lang::get('posts.all'));
- }
+           $result = Image::where('post_id', $post->id)->get();
+           if (count($result)>0) {
+               $images[$post->id] = $result[0]->image;
+           }
+       }
+       return view('posts.index')->with('posts', $posts)->with('images', $images)->with('title', Lang::get('posts.all'));
+   }
 
     /**
      * Show the form for creating a new resource.
@@ -79,59 +80,64 @@ class PostsController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'title' => 'required',
-            'image.*' => 'image|max:1999',
-            'mobile' => 'required|numeric',
-            'price' => 'required|numeric',
-        ]);
+        if (auth()->user()->status == 'blocked') {
+            return redirect('/posts')->with('error', 'Ваш аккаунт заблокирован! Обратитесь к администратору');
+        }
+        else {
+
+            $this->validate($request, [
+                'title' => 'required',
+                'image.*' => 'image|max:1999',
+                'mobile' => 'required|numeric',
+                'price' => 'required|numeric',
+            ]);
 
 
-        $images = $request->file('image');
+            $images = $request->file('image');
 
         //Get next id for image storage
 
-        $statement = DB::select("SHOW TABLE STATUS LIKE 'posts'");
-        $post_id = $statement[0]->Auto_increment;
+            $statement = DB::select("SHOW TABLE STATUS LIKE 'posts'");
+            $post_id = $statement[0]->Auto_increment;
 
         //Create post
 
-        $post = new Post;
-        $post->title = $request->input('title');
-        $post->body = $request->input('description');
-        $post->price = $request->input('price');
-        $post->mobile = $request->input('mobile');
-        $post->city_id = ($request->input('cities')[0]);
-        $post->street = $request->input('street');
-        $post->house = $request->input('house');
-        $post->apartment = $request->input('apartment');
-        $post->type_id = ($request->input('types')[0]);
-        $post->user_id = auth()->user()->id;
-        $post->save();
+            $post = new Post;
+            $post->title = $request->input('title');
+            $post->body = $request->input('description');
+            $post->price = $request->input('price');
+            $post->mobile = $request->input('mobile');
+            $post->city_id = ($request->input('cities')[0]);
+            $post->street = $request->input('street');
+            $post->house = $request->input('house');
+            $post->apartment = $request->input('apartment');
+            $post->type_id = ($request->input('types')[0]);
+            $post->user_id = auth()->user()->id;
+            $post->save();
 
         //Store photos
-        if(!empty($images)){
-            foreach ($images as $image) {
-                $fileNameToStore= uniqid().'.'.$image->getClientOriginalExtension();;
+            if(!empty($images)){
+                foreach ($images as $image) {
+                    $fileNameToStore= uniqid().'.'.$image->getClientOriginalExtension();;
                 // Upload Image
-                $path = $image->move('user_images', $fileNameToStore);
+                    $path = $image->move('user_images', $fileNameToStore);
 
+                    $img = new Image;
+                    $img->image = $fileNameToStore;
+                    $img->post_id = $post_id;
+                    $img->save();
+                }
+            }
+            else {
+                $defaultImage = 'noImage.png';
                 $img = new Image;
-                $img->image = $fileNameToStore;
+                $img->image = $defaultImage;
                 $img->post_id = $post_id;
                 $img->save();
             }
-        }
-        else {
-            $defaultImage = 'noImage.png';
-            $img = new Image;
-            $img->image = $defaultImage;
-            $img->post_id = $post_id;
-            $img->save();
-        }
 
-        return redirect('/posts')->with('success', '');
-
+            return redirect('/posts')->with('success', '');
+        }
     }
 
     /**
@@ -168,13 +174,13 @@ class PostsController extends Controller
     $posts = Post::where('type_id', '5')->orderBy('created_at', 'desc')->paginate(5);
     $images = [''=>''];
     foreach ($posts as $post) {
-     $result = Image::where('post_id', $post->id)->get();
-     if (count($result)>0) {
-         $images[$post->id] = $result[0]->image;
-     }
- }
+       $result = Image::where('post_id', $post->id)->get();
+       if (count($result)>0) {
+           $images[$post->id] = $result[0]->image;
+       }
+   }
 
- return view('posts.index')->with('posts', $posts)->with('images', $images)->with('title', Lang::get('nav.houses'));
+   return view('posts.index')->with('posts', $posts)->with('images', $images)->with('title', Lang::get('nav.houses'));
 }
 
 public function showApartment1()
@@ -182,13 +188,13 @@ public function showApartment1()
     $posts = Post::where('type_id', '2')->orderBy('created_at', 'desc')->paginate(5);
     $images = [''=>''];
     foreach ($posts as $post) {
-     $result = Image::where('post_id', $post->id)->get();
-     if (count($result)>0) {
-         $images[$post->id] = $result[0]->image;
-     }
- }
+       $result = Image::where('post_id', $post->id)->get();
+       if (count($result)>0) {
+           $images[$post->id] = $result[0]->image;
+       }
+   }
 
- return view('posts.index')->with('posts', $posts)->with('images', $images)->with('title',Lang::get('nav.apartment1'));
+   return view('posts.index')->with('posts', $posts)->with('images', $images)->with('title',Lang::get('nav.apartment1'));
 }
 
 public function showApartment2()
@@ -196,13 +202,13 @@ public function showApartment2()
     $posts = Post::where('type_id', '3')->orderBy('created_at', 'desc')->paginate(5);
     $images = [''=>''];
     foreach ($posts as $post) {
-     $result = Image::where('post_id', $post->id)->get();
-     if (count($result)>0) {
-         $images[$post->id] = $result[0]->image;
-     }
- }
+       $result = Image::where('post_id', $post->id)->get();
+       if (count($result)>0) {
+           $images[$post->id] = $result[0]->image;
+       }
+   }
 
- return view('posts.index')->with('posts', $posts)->with('images', $images)->with('title', Lang::get('nav.apartment2'));
+   return view('posts.index')->with('posts', $posts)->with('images', $images)->with('title', Lang::get('nav.apartment2'));
 }
 
 public function showApartment3()
@@ -210,13 +216,13 @@ public function showApartment3()
     $posts = Post::where('type_id', '4')->orderBy('created_at', 'desc')->paginate(5);
     $images = [''=>''];
     foreach ($posts as $post) {
-     $result = Image::where('post_id', $post->id)->get();
-     if (count($result)>0) {
-         $images[$post->id] = $result[0]->image;
-     }
- }
+       $result = Image::where('post_id', $post->id)->get();
+       if (count($result)>0) {
+           $images[$post->id] = $result[0]->image;
+       }
+   }
 
- return view('posts.index')->with('posts', $posts)->with('images', $images)->with('title', Lang::get('nav.apartment3'));
+   return view('posts.index')->with('posts', $posts)->with('images', $images)->with('title', Lang::get('nav.apartment3'));
 }
 
 public function showStudio()
@@ -224,13 +230,13 @@ public function showStudio()
     $posts = Post::where('type_id', '1')->orderBy('created_at', 'desc')->paginate(5);
     $images = [''=>''];
     foreach ($posts as $post) {
-     $result = Image::where('post_id', $post->id)->get();
-     if (count($result)>0) {
-         $images[$post->id] = $result[0]->image;
-     }
- }
+       $result = Image::where('post_id', $post->id)->get();
+       if (count($result)>0) {
+           $images[$post->id] = $result[0]->image;
+       }
+   }
 
- return view('posts.index')->with('posts', $posts)->with('images', $images)->with('title', Lang::get('nav.studio'));
+   return view('posts.index')->with('posts', $posts)->with('images', $images)->with('title', Lang::get('nav.studio'));
 }
 
 public function showArea()
@@ -238,13 +244,13 @@ public function showArea()
     $posts = Post::where('type_id', '6')->orderBy('created_at', 'desc')->paginate(5);
     $images = [''=>''];
     foreach ($posts as $post) {
-     $result = Image::where('post_id', $post->id)->get();
-     if (count($result)>0) {
-         $images[$post->id] = $result[0]->image;
-     }
- }
+       $result = Image::where('post_id', $post->id)->get();
+       if (count($result)>0) {
+           $images[$post->id] = $result[0]->image;
+       }
+   }
 
- return view('posts.index')->with('posts', $posts)->with('images', $images)->with('title',Lang::get('nav.area'));
+   return view('posts.index')->with('posts', $posts)->with('images', $images)->with('title',Lang::get('nav.area'));
 }
 
 public function showGarage()
@@ -252,13 +258,13 @@ public function showGarage()
     $posts = Post::where('type_id', '7')->orderBy('created_at', 'desc')->paginate(5);
     $images = [''=>''];
     foreach ($posts as $post) {
-     $result = Image::where('post_id', $post->id)->get();
-     if (count($result)>0) {
-         $images[$post->id] = $result[0]->image;
-     }
- }
+       $result = Image::where('post_id', $post->id)->get();
+       if (count($result)>0) {
+           $images[$post->id] = $result[0]->image;
+       }
+   }
 
- return view('posts.index')->with('posts', $posts)->with('images', $images)->with('title', Lang::get('nav.garage'));
+   return view('posts.index')->with('posts', $posts)->with('images', $images)->with('title', Lang::get('nav.garage'));
 }
 
 public function showOther()
@@ -267,13 +273,13 @@ public function showOther()
     $posts = Post::whereNotIn('type_id', $typesList)->orderBy('created_at', 'desc')->paginate(5);
     $images = [''=>''];
     foreach ($posts as $post) {
-     $result = Image::where('post_id', $post->id)->get();
-     if (count($result)>0) {
-         $images[$post->id] = $result[0]->image;
-     }
- }
+       $result = Image::where('post_id', $post->id)->get();
+       if (count($result)>0) {
+           $images[$post->id] = $result[0]->image;
+       }
+   }
 
- return view('posts.index')->with('posts', $posts)->with('images', $images)->with('title', Lang::get('nav.other'));
+   return view('posts.index')->with('posts', $posts)->with('images', $images)->with('title', Lang::get('nav.other'));
 }
     /**
      * Show the form for editing the specified resource.
@@ -289,10 +295,10 @@ public function showOther()
         if (!Auth::guest()) {
             if (auth()->user()->role == 0){
                 if(auth()->user()->id != $post->user_id) 
-                return redirect('/posts')->with('error', '');
+                    return redirect('/posts')->with('error', '');
             }
         }
-       
+
         $cities = City::lists('name', 'id');
         $types = Types::lists('name', 'id');
         $images = Image::where('post_id', $id)->get();
@@ -364,8 +370,8 @@ public function showOther()
     {
         $post=Post::find($id);
         if (auth()->user()->role == 0){
-                if(auth()->user()->id != $post->user_id) 
-                    return redirect('/posts')->with('error', '');
+            if(auth()->user()->id != $post->user_id) 
+                return redirect('/posts')->with('error', '');
         }
 
         $post->delete();
@@ -400,9 +406,9 @@ public function showOther()
 
         if($request->ajax())
         {
-         $fav = Favourite::where('post_id', $request->input('id'))->where('user_id', auth()->user()->id)->get();
+           $fav = Favourite::where('post_id', $request->input('id'))->where('user_id', auth()->user()->id)->get();
 
-         if (count($fav) ==0) {
+           if (count($fav) ==0) {
             $isFav = false;
         }
         else $isFav = true;

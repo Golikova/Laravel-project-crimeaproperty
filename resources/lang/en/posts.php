@@ -30,4 +30,7 @@ return [
     'edit' => 'Edit',
     'delete' => 'Delete',
     'all' => 'All',
+    'active' => 'Active',
+    'hidden' => 'Hidden',
+    'status' => 'Status',
 ];

@@ -10,6 +10,7 @@ use Auth;
 use Session;
 use Lang;
 use App;
+use App\Post;
 
 class UsersController extends Controller
 {
@@ -137,8 +138,9 @@ class UsersController extends Controller
                 return   redirect('/login')->with('error', Lang::get('validation.authError'));
             else {
         $user=User::find($id);
-
         $user->delete();
+
+        $posts=Post::where('user_id', $id)->delete();
             
         return redirect('/users')->with('success', '');
     }

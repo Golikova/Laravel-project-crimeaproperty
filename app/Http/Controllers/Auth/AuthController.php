@@ -7,6 +7,8 @@ use Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
+use Session;
+use App;
 
 class AuthController extends Controller
 {
@@ -38,6 +40,8 @@ class AuthController extends Controller
      */
     public function __construct()
     {
+        $lang = Session::get ('locale');
+        if ($lang != null) App::setLocale($lang);
         $this->middleware($this->guestMiddleware(), ['except' => 'logout']);
     }
 
@@ -52,7 +56,7 @@ class AuthController extends Controller
         return Validator::make($data, [
             'name' => 'required|max:255',
             'email' => 'required|email|max:255|unique:users',
-            'password' => 'required|min:6|confirmed',
+            'password' => 'required|min:6|confirmed',            
         ]);
     }
 

@@ -4,13 +4,25 @@
 <h1>@lang('posts.edit')</h1>
 {!! Form::open(['action' => ['PostsController@update', $post->id], 'method' => 'POST', 'enctype' => 'multipart/form-data']) !!}
 <div class="form-group">
+       <div class="row">
+       <div class="form-group col-lg-7">
     {{Form::label('title',  Lang::get('posts.title'))}}
     {{Form::text('title', $post->title, ['class' => 'form-control', 'placeholder' =>  Lang::get('posts.title')])}}
+  </div>
+        <div class="form-group col-lg-3">
+    {!! Form::label( Lang::get('posts.status')) !!}
+    {!! Form::select('status[]', 
+        ['active' => Lang::get('posts.active'), 'hidden' => Lang::get('posts.hidden')], 
+        $post->status, 
+        ['class' => 'form-control']) !!}
+    </div>
+  </div>
 </div>
 <hr>
 
 <br />
 <div class="row">
+
  <div class="form-group col-lg-3">
 {!! Form::label( Lang::get('posts.type')) !!}
     {!! Form::select('types[]', 

@@ -44,20 +44,19 @@ class PostsController extends Controller
     public function index()
     {
         $posts = Post::orderBy('created_at', 'desc')->paginate(5);
-        foreach ($posts as $post) {
-            $city = (City::where('id',$post->city_id)->get());
-            $post->city = $city[0]->name;
-        }
-        
+
         $images = [''=>''];
         foreach ($posts as $post) {
+
            $result = Image::where('post_id', $post->id)->get();
            if (count($result)>0) {
-               $images[$post->id] = $result[0]->image;
-           }
-       }
-       return view('posts.index')->with('posts', $posts)->with('images', $images)->with('title', Lang::get('posts.all'));
-   }
+             $images[$post->id] = $result[0]->image;
+         }
+     }
+     return view('posts.index')->with('posts', $posts)->with('images', $images)->with('title', Lang::get('posts.all'));
+     
+     
+ }
 
     /**
      * Show the form for creating a new resource.
@@ -105,6 +104,7 @@ class PostsController extends Controller
             $post = new Post;
             $post->title = $request->input('title');
             $post->body = $request->input('description');
+            $post->status = 'active';
             $post->price = $request->input('price');
             $post->mobile = $request->input('mobile');
             $post->city_id = ($request->input('cities')[0]);
@@ -329,6 +329,7 @@ public function showOther()
         $post = Post::find($id);
         $post->title = $request->input('title');
         $post->body = $request->input('description');
+        $post->status = ($request->input('status')[0]);
         $post->price = $request->input('price');
         $post->mobile = $request->input('mobile');
         $post->city_id = ($request->input('cities')[0]);

@@ -9,6 +9,7 @@
 
 @if (count($posts) > 0)
 @foreach($posts as $post)
+@if ($post->status != 'hidden')
 <div class="well">
 	<div class="row">
 		<div class="col-md-3 col-sm-4">
@@ -42,6 +43,7 @@
 	<small> @lang('posts.by') {{$post->user->name}}</small>
 
 </div>
+@endif
 @endforeach
 {{$posts->links()}}
 @else

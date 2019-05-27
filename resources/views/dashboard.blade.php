@@ -15,12 +15,14 @@
         <table class="table table-striped">
             <tr>
                 <th>@lang('personal.title')</th>
+                <th>@lang('posts.status')</th>
                 <th></th>
                 <th></th>
             </tr>
             @foreach ($posts as $post)
             <tr>
                 <td><a href="/posts/{{$post->id}}">{{$post->title}}</a></td>
+                <td>@lang('posts.'.$post->status)</td>
                 <td><a href="/posts/{{$post->id}}/edit" class="btn btn-default pull-right">@lang('personal.edit')</a></td>
                 <td>
                     {!!Form::open(['action' => ['PostsController@destroy', $post->id], 'method' => 'POST', 'class' => 'pull-right'])!!}

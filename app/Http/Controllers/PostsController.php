@@ -33,7 +33,6 @@ class PostsController extends Controller
         {
             $lang = Session::get ('locale');
             if ($lang != null) App::setLocale($lang);
-            $this->middleware('auth', ['except'=>['index', 'show']]);
         }
 
     /**
@@ -44,10 +43,8 @@ class PostsController extends Controller
     public function index()
     {
         $posts = Post::orderBy('created_at', 'desc')->paginate(5);
-
         $images = [''=>''];
         foreach ($posts as $post) {
-
            $result = Image::where('post_id', $post->id)->get();
            if (count($result)>0) {
              $images[$post->id] = $result[0]->image;

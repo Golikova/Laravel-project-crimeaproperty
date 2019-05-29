@@ -14,6 +14,7 @@
 	<div class="row">
 		<div class="col-md-3 col-sm-4">
 			@if (!empty($images[$post->id]))
+			<a href="/posts/{{$post->id}}">
 			<h3><img style="width: 100%;" src="/user_images/{{$images[$post->id]}}" alt=""></h3>
 			@else 
 			<h3><img style="width: 100%;" src="/user_images/noimage.png" alt=""></h3>
@@ -33,6 +34,7 @@
 			@if ($post->apartment)
 			@lang('posts.apartment') {{$post->apartment}} <br>
 			@endif
+		</a>
 		</div>
 
 		<div class="col-md-2 col-sm-4 pull-right">

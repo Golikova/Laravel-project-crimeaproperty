@@ -153,7 +153,8 @@ class PostsController extends Controller
             $fav = Favourite::where('post_id', $id)->where('user_id', auth()->user()->id)->get();
         else 
             $fav = null;
-        if (count($fav) ==0) {
+
+        if ($fav == null) {
             $fav = false;
         }
         else $fav = true;

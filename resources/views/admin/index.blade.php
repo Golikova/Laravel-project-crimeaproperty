@@ -7,7 +7,7 @@
            <a class="btn btn-success" href="/users" role="button">@lang('nav.usersControl')</a></p>
        </div>
         <div class="row">
-           <a class="btn btn-success" href="/aboutEditing" role="button">@lang('nav.aboutEditing')</a></p>
+           <a class="btn btn-success" href="/abouts" role="button">@lang('nav.aboutEditing')</a></p>
        </div>
         <div class="row">
            <a class="btn btn-success" href="/cities" role="button">@lang('nav.cities')</a></p>
